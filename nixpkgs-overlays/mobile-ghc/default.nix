@@ -11,6 +11,7 @@ self: super: {
           ./8.2.y/android-patches/undefine_MYTASK_USE_TLV_for_CC_SUPPORTS_TLS_zero.patch
           ./8.2.y/android-patches/force-relocation-equal-pic.patch
           ./8.2.y/android-patches/rts_android_log_write.patch
+          ./8.2.y/android-patches/force-armv7.patch
         ] ++ lib.optionals self.stdenv.targetPlatform.isiOS [
           ./8.2.y/fixed-ios.patch
           #(self.buildPackages.fetchpatch {
@@ -23,6 +24,7 @@ self: super: {
     } // lib.mapAttrs (n: v: v.overrideAttrs (drv: {
         patches = (drv.patches or []) ++ lib.optionals self.stdenv.targetPlatform.useAndroidPrebuilt [
           ./8.4.y/android-patches/force-relocation.patch
+          ./8.4.y/android-patches/force-armv7.patch
         ];
     })) { inherit (super.haskell.compiler) ghc843 ghcHEAD ghcSplices; };
   };
