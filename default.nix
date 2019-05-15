@@ -96,6 +96,14 @@ let iosSupport = system == "x86_64-darwin";
     inherit (nixpkgs) lib fetchurl fetchgit fetchgitPrivate fetchFromGitHub;
 
     nixpkgsCross = {
+      windows = lib.mapAttrs (_: args: nixpkgsFunc (nixpkgsArgs // args)) rec {
+        mingwW32 = {
+          crossSystem = lib.systems.examples.mingwW32;
+        };
+        mingwW64 = {
+          crossSystem = lib.systems.examples.mingwW64;
+        };
+      };
       android = lib.mapAttrs (_: args: nixpkgsFunc (nixpkgsArgs // args)) rec {
         aarch64 = {
           crossSystem = lib.systems.examples.aarch64-android-prebuilt;
@@ -446,6 +454,10 @@ let iosSupport = system == "x86_64-darwin";
     overrides = nixpkgsCross.ios.aarch32.haskell.overlays.combined;
   };
 
+  ghcMingwW64 = makeRecursivelyOverridableBHPToo ((makeRecursivelyOverridable nixpkgsCross.windows.mingwW64.haskell.packages.integer-simple.ghcSplices-8_4).override {
+    overrides = nixpkgsCross.windows.mingwW64.haskell.overlays.combined;
+  });
+
   #TODO: Separate debug and release APKs
   #TODO: Warn the user that the android app name can't include dashes
   android = androidWithHaskellPackages {
@@ -485,6 +497,7 @@ in let this = rec {
           ghc8_2
           ghc8_0
           ghc7
+          ghcMingwW64
           ghcIosSimulator64
           ghcIosAarch64
           ghcIosAarch64-8_4
